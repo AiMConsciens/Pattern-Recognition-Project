@@ -462,7 +462,35 @@ The matrix of the error-rates after applying different classifiers on PCA-mapped
 		  \caption{Error rates on PCA mapped and raw pixels for bilinear interpolation between pixels}   \label{table: errorrates of PCA mappings bilinear}%
 \end{table}%
 
+\clearpage
 
+\section{Appendix B: Matlab Code}
+
+\begin{lstlisting}[caption=Script for performance evaluation of scenario 2,label=code:eval-script-scenario2]
+nist_data = prnist(0:9,1:1000);
+
+iter = 2;      % Number of performance evaluations
+num_test = 50;  % Number of test objects per class
+
+errors = zeros(1:iter, 1);
+
+for i = 1:iter
+    % Generate a random training set with 10 objects per class 
+    n_trn = gendat(nist_data, 0.01);
+    % Calculate trainings prdataset object
+    trn = my_rep2(n_trn);
+    
+    % Train SVC classifier
+    w = svc(trn);
+    
+    % Evaluate performance of classifier
+    E = nist_eval('my_rep2', w, num_test);
+    
+    errors(i) = E;
+end
+
+disp(errors);
+\end{lstlisting}
 
 \bibliographystyle{abbrv}
 \nocite{*}

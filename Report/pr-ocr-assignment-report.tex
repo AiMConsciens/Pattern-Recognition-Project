@@ -281,6 +281,8 @@ After converting our images to \texttt{DIPimage} objects we can exploit the \tex
     \caption{Image features computed by DIPimage's \texttt{measurement} function \label{table:image-features}}
 \end{table}
 
+To be able to compute all these features we create two image objects in Matlab; the original image and a thresholded binary image. The binary image is required for some measuring some of the above features. After measuring all the features we build a matrix containg the results, this will become our dataset. Before returning the dataset for classification we also perform \emph{scaling} on the variance of the features.
+
 \subsection{Initial Results and Optimal Classifier}
 
 Having obtained the feature matrix and converted this to data set we did some initial testing on the features. To this end we loaded the entire NIST dataset, from this we generated two datasets, one for training and one for testing. The training dataset contains $10$ objects per class, for testing we selected $50$ objects per class. \\

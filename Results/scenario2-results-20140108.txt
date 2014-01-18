@@ -1,0 +1,13 @@
+SCENARIO 2 (2014-01-08)
+
+########################################################
+n_trn = gendat(nist_data, 0.01);
+n_tst = gendat(nist_data, 0.05);
+- 29 image features
+- Without pixel features! 
+
+1NN		  Parzen	Fisher	  NMC		SVC
+0.3280    0.3100    0.2940    0.3340    0.2520		SVC
+0.2860    0.2880    0.2540    0.3420    0.2520		SVC
+0.3840    0.3100    0.2560    0.3620    0.3140		Parzen
+0.3660    0.3420    0.2860    0.3360    0.2780		SVC

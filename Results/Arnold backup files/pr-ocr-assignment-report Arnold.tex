@@ -1,0 +1,268 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{soul}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{framed}
+\usepackage[sc]{mathpazo}
+\linespread{1.20}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{courier}
+\usepackage{enumitem}
+\usepackage{lipsum}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{light-gray}{gray}{0.95}
+
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true,language=Matlab}
+\lstset{frame=single,commentstyle=\color{mygreen}}
+\lstset{aboveskip=0.5cm,belowskip=0.3cm}
+\lstset{backgroundcolor=\color{light-gray}}
+
+\graphicspath{ {./images/} }
+
+\hypersetup{pdfpagemode=UseNone}
+
+\newcommand{\todo}[1] {\hl{TODO: #1}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+
+\title{The Classification of Individual Digits \\ Using Pattern Recognition Techniques}
+\author{Tom Runia \& Arnold Schutter}
+
+\maketitle
+
+Optical Character Recognition (OCR) is the conversion of scanned images containing written or printed text into machine-encoded text using pattern recognition. It is widely used in our modern world, for example to automatically read out passport documents or bank statements. In this paper we employ various pattern recognition techniques to classify individual digits in bank account numbers. The implementation is done using Matlab and the pattern recognition toolbox PRtools \cite{prtools-manual}. This paper was written as part of the graduate course Pattern Recognition given at Delft University of Technology.
+
+\section{Introduction}
+The goal of this paper is to research the possibilities of using pattern recognition techniques to classify individual handwritten digits on bank statements. There are two scenarios that we are interested in. In the first scenario the OCR system is only trained once and then applied to the field. The second scenario allows the systems to be trained for each batch of cheques. Both of these scenarios are worked out by training and testing on the standard dataset of handwritten digits which is available for free through the US National Institute of Standards \& Technologies (NIST). \\
+
+The structure of this article is as follows. First we start by discussing the first scenario and presenting our solution to the problem. Also we report our design choices and present some test results regarding the classification performance. Then we continue by discussing the second scenario in the same manner. Finally we review our work in the conclusion and give some recommendations for future work.
+
+
+\section{Scenario 1: \textit{System is trained once}}
+
+As already mentioned, this scenario only allows the recognition system to be trained once. After this initial training phase the system should be able to recognize individual digits with an error rate lower than $5\%$. This means that we should use a large amount of training data in order to allow accurate classification. Because of the presence of a lot of training data, there are many ways to train a classifier. 
+
+\subsection{Classifying raw pixels}
+The first way of classifying is to use the raw pixels of the image without filtering or adding extra features. Since the images contain $256 \times 256$ pixels, using all the pixels yields an amount of features bigger than the size of the training set. To avoid the \emph{curse of dimensionality} we lower the amount of features by scaling the images with the image-mapping tools in \texttt{PRTools}. The optimal size and the optimal way of interpolating the pixels is found empirically. For the classification are complex classifiers preferred above less complex classifiers, because of the presence of a lot of available features. However, to make it possible to compare different classifiers on different pixel-sizes, also less complex classifiers are used such as \textit{linear discriminant classifier} and \textit{nearest mean classifier}. The results are shown in Table~\ref{table:results-only-pixels}.
+
+% Table of classifiers on raw pixels
+\begin{table}[H]
+  \centering
+    \begin{tabular}{l|l|llllll}
+    \toprule
+    Scaletype & Pixels & parzen & ldc   & qdc   & fisher & nmc   & knnc \\
+    \midrule
+		\hline
+    \textbf{bicubic} & 8x8   & \textbf{0,039} & 0,109 & 0,054 & 0,136 & 0,189 & 0,046 \\
+    \textbf{} & 9x9   & \textbf{0,036} & 0,67  & 0,191 & 0,129 & 0,193 & 0,049 \\
+    \textbf{} & 10x10 & \textbf{0,021} & 0,885 & 0,488 & 0,12  & 0,15  & 0,023 \\
+    \textbf{} & 11x11 & \textbf{0,03} & 0,899 & 0,65  & 0,141 & 0,187 & 0,032 \\
+    \textbf{} & 12x12 & \textbf{0,044} & 0,897 & 0,675 & 0,159 & 0,194 & \textbf{0,044} \\
+    \textbf{} & 13x13 & \textbf{0,041} & 0,9   & 0,69  & 0,146 & 0,198 & 0,042 \\
+		\hline
+    \textbf{nearest} & 8x8   & \textbf{0,109} & 0,16  & 0,352 & 0,177 & 0,213 & 0,13 \\
+    \textbf{} & 9x9   & \textbf{0,114} & 0,164 & 0,325 & 0,186 & 0,221 & 0,131 \\
+    \textbf{} & 10x10 & \textbf{0,108} & 0,833 & 0,532 & 0,165 & 0,208 & 0,11 \\
+    \textbf{} & 11x11 & \textbf{0,085} & 0,887 & 0,711 & 0,171 & 0,217 & 0,103 \\
+    \textbf{} & 12x12 & \textbf{0,083} & 0,9   & 0,763 & 0,146 & 0,191 & 0,088 \\
+    \textbf{} & 13x13 & \textbf{0,096} & 0,898 & 0,784 & 0,169 & 0,222 & 0,107 \\
+		\hline
+    \textbf{bilinear} & 8x8   & \textbf{0,029} & 0,111 & 0,049 & 0,14  & 0,188 & 0,032 \\
+    \textbf{} & 9x9   & \textbf{0,047} & 0,798 & 0,284 & 0,142 & 0,203 & 0,049 \\
+    \textbf{} & 10x10 & \textbf{0,032} & 0,895 & 0,579 & 0,14  & 0,199 & 0,038 \\
+    \textbf{} & 11x11 & \textbf{0,039} & 0,898 & 0,689 & 0,151 & 0,192 & 0,042 \\
+    \textbf{} & 12x12 & 0,041 & 0,899 & 0,719 & 0,147 & 0,198 & \textbf{0,04} \\
+    \textbf{} & 13x13 & \textbf{0,04} & 0,9   & 0,712 & 0,134 & 0,16  & \textbf{0,04} \\
+		\hline
+    \textbf{} & Best  & \textbf{0,021} & 0,109 & 0,049 & 0,12  & 0,15  & 0,023 \\
+    \bottomrule
+    \end{tabular}%
+		\caption{Error rates of various classifiers using pixels with different sizes and scaling types 
+		\label{table:results-only-pixels}}
+\end{table}%
+
+\\
+
+The results in the table show that the parzen and k-nearest neighbor classifiers perform best, the latter performs above expectations. The good performance of the k-nearest neighbor classifier raises the idea that the pixels per class cluster well. The quadratic bayes normal classifier (qdc) performs a bit worse, from this we conclude that the measurements of each class are not well normally distributed. As expected, the rest of the classifiers, all non-complex, perform worse.
+
+After optimizing the scaling of the images and finding the best classifier, which is knnc in this case, the next step will be to lower the error-rate. Therefore extra features will be produced with the imaging features function in \emph{PRTools}. 
+
+\subsection{Classifying standard extra features}
+There are several ways of extracting features from the pixels, e.g. the\textit{ eccentricity}, the \textit{centroid} and the \textit{major axis length}. These extra features can be generated by using the Matlab function \textit{im_features}, which generates \todo{is it really 17?} 17 extra features. On the unchanged features, the same classifiers are tested. There are less features now, so it is assumed that the most complex classifiers will perform worse and less complex classifiers will relatively perform better. The results are shown in the table below.
+
+\todo{insert table of classifiers on raw features and insert conclusions}
+
+\subsection{Classifying PCA mapped data}
+In the previous sections, a lot of features used for the classification may not contribute significant, which is to be expected especially in the raw pixels. It could be useful to map the feature space into a smaller but more information containing feature space. This is done by principal component analysis (PCA), which maps the feature space using orthogonal transformation. The PCA can be carried out with different types of scaling. The first type of scaling which is used is c-mean: the mean is shifted to the origin. Since the scales of features vary a lot, it is also tried to normalize the variation of the features. Therefor the c-variation is used: the mean is shifted to the origin and the average class variances are normalized. The classifiers used are equal to the classifiers above to be able to compare the differences.
+
+\todo{insert table of PCA mapping results}
+
+
+
+\subsection{Classifying extra features of DIP image}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Scenario 2: \textit{System is trained for each batch}}
+
+The second scenario allows the classifier to be trained for every batch of cheques to be processed. As a concequence the dataset available for training is much smaller, in this scenario we train the classifier using at most $10$ objects per class. The target for this assignment is $25\%$ test error.
+
+\subsection{Representation}
+Again the development of our algorithm begins with choosing the best representation for our data set. Here we need to take into account that the number of objects that are available for training is small compared to the first scenario. Therefore the information in the raw pixel features as were used in the first part is probably not sufficient. We are left with two options, calculate various \emph{image features} or choose the path of \emph{dissimilarities}. \todo{Why did we choose for features?} \\
+
+The standard methods of Matlab supplemented with the \texttt{PRtools} is limited in image analysis. By choosing the image feature representation we needed a flexible and powerful image processing toolkit for Matlab. We have chosen to incorporate \texttt{DIPimage} for our project since we already had experience with it and integrates nicely with \texttt{PRtools}.
+
+\subsection{Feature Selection}
+
+After converting our images to \texttt{DIPimage} objects we can exploit the \texttt{measurement} method that allows easy computation of a large amount of image statistics and more. We have selected a large amount of these statistics to use as features. In the selection process we have intuitively picked the features which we thought are differentiating the digits. Table~\ref{table:image-features} lists the features that were initially used as features. \todo{Write down the number of features per entry in the table since some of them contain multiple values (x,y etc)}
+
+\begin{table}[H]
+	\centering
+    \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Feature} & \textbf{Description} \\
+    \hline
+    \emph{Object Count}     & Number of objects, sometimes there are two smaller objects \\
+    \emph{Total Size}       & Total number of object pixels           \\
+    \emph{Radius}       	& Statistics on the radius using chain-code method           \\
+    \emph{Center}  		& Coordinates of the geometric mean \\
+    \emph{Gravity} 		& Coordinates of the center-of-mass \\
+    \emph{Inertia} 		& Moments of intertia \\
+    \emph{Mu} 				& Elements of the inertia tensor \\
+    \emph{ConvexArea} 		& Area of the convex hull \\
+    \emph{CartesianBox} 	& Cartesian box size around the object \\
+    \emph{CCBendingEnergy} & Bending energy of the object perimeter \\
+    \emph{Convexity} 		& Area fraction of convex hull covered by the object \\
+    \emph{Feret} 			& Minimum and maximum object diameters \\
+    \emph{Mean} 			& Mean object intensity \\
+    \emph{Circularity} 	& Circularity of the object \\
+    \emph{Perimeter} 		& Length of the object perimeter (chain-code) \\
+    \emph{Sum of Pixels} 	& Sum of object intensity (mass) \\
+    \hline
+    \end{tabular}
+    \caption{Image features computed by DIPimage's \texttt{measurement} function \label{table:image-features}}
+\end{table}
+
+\subsection{Initial Results and Optimal Classifier}
+
+Having obtained the feature matrix and converted this to data set we did some initial testing on the features. To this end we loaded the entire NIST dataset, from this we generated two datasets, one for training and one for testing. The training dataset contains $10$ objects per class, for testing we selected $50$ objects per class. \\
+
+We started training with various classifiers; \emph{nearest-mean}, \emph{fisher}, \emph{parzen}, \emph{k-nearest neighbor} and \emph{support vector machines}. The training and test phase with the class sizes as stated above were repeated five times in order to get representative results, our foundings are listed in Table~\ref{table:results-only-features}. For each result the best performance (lowest error) is indicated in bold. 
+
+\begin{table}[H]
+	\centering
+    \begin{tabular}{|l|lllll|}
+    \hline
+	& \textbf{1NN} & \textbf{Parzen} & \textbf{Fisher} & \textbf{NMC} & \textbf{SVC} \\
+	\hline
+	1 & 0.3280 &  0.3100 &   0.2940 &   0.3340 &   \textbf{0.2520} \\
+	2 & 0.2860 &  0.2880 &   0.2540 &   0.3420 &   \textbf{0.2520} \\		
+	3 & 0.3840 &  0.3100 &   \textbf{0.2560} &   0.3620 &   0.3140 \\	
+	4 & 0.3660 &  0.3420 &   0.2860 &   0.3360 &   \textbf{0.2780} \\
+	5 & 0.3340 &  0.2980 &   0.3000 &   0.3960 &   \textbf{0.2540} \\
+	\hline
+    \end{tabular}
+    \caption{Error rates of various classifiers using $29$ image features \label{table:results-only-features}}
+\end{table}
+
+From these measurements we directly notice that using support vector machines with polynomial kernel as classifier yields the best result with an average error rate of $27\%$. Although this is a good initial result, we want to decrease the error rate.
+
+\subsection{Improving the Error Rate}
+
+First we want to see the effect of using different kernels with SVC. This is done by applying the same settings as above and training SVC with seven different kernels that are listed below.
+
+\begin{itemize}[noitemsep]
+    \item Polynomial kernel (P)
+    \item Exponential kernel (E)
+    \item Radial kernel (R)
+    \item Sigmoid kernel (S)
+    \item Distance kernel (D)
+    \item Minkowski kernel (M)
+    \item City-Block kernel (C)
+\end{itemize}
+
+After performing tests with these kernels we quickly concluded to stick to the \emph{polynomial kernel} since it extremely outperformed the others. The results are shown in Table~\ref{table:results-svc-kernels} with the best result indicated in bold font.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|lllllll|}
+    \hline
+    & \textbf{P} & \textbf{E} & \textbf{R} & \textbf{S} & \textbf{D} & \textbf{M} & \textbf{C} \\
+    \hline
+    1 & \textbf{0.2520} &   0.6080 &   0.7160 &   0.4660 &   0.9980 & 0.9980 &   0.9980 \\
+    2 & \textbf{0.2840} &   0.5080 &   0.7340 &   0.4980 &   1.0000 & 0.9980 &   0.9980 \\
+    3 & \textbf{0.2780} &   0.7600 &   0.7560 &   0.5160 &   0.9940 & 0.9940 &   0.9940 \\
+    4 & \textbf{0.2640} &   0.6360 &   0.8180 &   0.5060 &   1.0000 & 0.9980 &   0.9980 \\
+    5 & \textbf{0.2520} &   0.8020 &   0.8420 &   0.5460 &   0.9960 & 1.0000 &   1.0000 \\
+    \hline
+    \end{tabular}
+    \caption{Error rates using SVC with different kernels \label{table:results-svc-kernels}}
+\end{table}
+
+We also wanted to try adding more features to the dataset returned by the \texttt{my\_rep} function. In order to do this, two options were available to us, first we could compute more (advanced) image features, and second we could down-scale the images and add the pixel values as features. Since we already maximally exploited DIPimage's \texttt{measure} function to compute image features we chose to test the second method first. \\
+
+The \texttt{my\_rep} function was modified so that it also down-scales the image to square size of $d \times d$ pixels. Before doing this we applied \emph{gaussian smoothing} to the digits and then applied resampling using \emph{Lanczos method} \cite{lanczos-filtering} as implemented by DIPimage. Our approach is to start by down-scaling the image by a large factor (small $d$) so that little pixels are added as features. We perform classification of our SVC using polynomial kernel and analyze the error rate. Then we continue increasing $d$ and see what effect this has on the error rate.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|lllllllll|}
+    \hline
+    $d$ & $4$ & $6$ & $8$ & $10$ & $12$ & $13$ & $14$ & $15$ & $16$ \\
+    \hline
+    1 & 0.2860 & 0.1960 & 0.2120 & 0.1620 & 0.1700 & 0.1540 & 0.1680 & 0.1700 & 0.1540 \\
+    2 & 0.3100 & 0.2540 & 0.2380 & 0.2180 & 0.1800 & 0.1760 & 0.1660 & 0.1600 & 0.2100 \\
+    3 & 0.2600 & 0.2540 & 0.2480 & 0.1680 & 0.1640 & 0.1620 & 0.1600 & 0.1980 & 0.1940 \\
+    4 & 0.2400 & 0.2120 & 0.2180 & 0.1700 & 0.1880 & 0.1920 & 0.1740 & 0.1740 & 0.1920 \\
+    \hline
+      & 0.2740 & 0.2290 & 0.2290 & 0.1795 & 0.1755 & 0.1710 & \textbf{0.1670} & 0.1755 & 0.1875 \\
+    \hline
+    \end{tabular}
+    \caption{Error rates using SVC and additional $d \times d$ pixel features \label{tab:svc-adding-pixel-features}}
+\end{table}
+
+From the results, displayed in Table~\ref{tab:svc-adding-pixel-features}, we notice a declining error rate if we add more pixels as features. However the average error rate increases if we continue to increase the image size beyond $14 \times 14$ pixels. One hypothesis about this increasing error rate beyond this size is that it is account for by the \emph{curse of dimensionality}. In conclusion we can say that the best results with an average error rate of $\mathbf{16.7 \%}$ were achieved using $29$ image features and $196$ additional pixel features. 
+
+\subsection{Misclassification of Individual Digits}
+
+To better understand our results we analyzed the misclassification rates per individual digit. This allows us to determine which of the digits are hard to correctly classify and give insight in how to improve our algorithm. Obtaining these numbers was straight forward, we performed classification $8$ times and averages the misclassification rates. The results are displayed in Figure~\ref{fig:digit-misclassification}. \\
+
+The chart displays the error rates per digit and directly shows us that digit $8$ is most often misclassified whereas the digit $0$ has the lowest error rate. \todo{explain why these digits are the highest and lowest, probably the best is to give some examples in picture form.}
+
+\begin{figure}[H]
+    \center
+    \includegraphics[width=.7\textwidth]{missclassification-digits.png}
+    \caption{Misclassification rates per digit (average over $8$ batches) \label{fig:digit-misclassification}}
+\end{figure}
+
+\section{Recommendations}
+
+In this section we discuss possible improvements for the classifiers we have presented in this article. \todo{Discuss possible improvements for scenario 1} \\
+
+Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Table~\ref{tab:svc-adding-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. \todo{this is not finished}
+
+\bibliographystyle{abbrv}
+\nocite{*}
+\bibliography{pr-ocr-assignment-report}
+
+\end{document}

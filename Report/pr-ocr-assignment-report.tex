@@ -16,6 +16,7 @@
 \usepackage{courier}
 \usepackage{enumitem}
 \usepackage{lipsum}
+\usepackage{verbatim}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{light-gray}{gray}{0.95}
@@ -298,23 +299,25 @@ We started training with various classifiers; \emph{nearest-mean}, \emph{fisher}
 
 \begin{table}[H]
 	\centering
-    \begin{tabular}{|l|lllll|}
+    \begin{tabular}{|l|llllll|}
     \hline
-	& \textbf{1NN} & \textbf{Parzen} & \textbf{Fisher} & \textbf{NMC} & \textbf{SVC} \\
+	& \textbf{1NN} & \textbf{3NN} & \textbf{Parzen} & \textbf{NMC} & \textbf{Fisher} & \textbf{SVC} \\
 	\hline
-	1 & 0.3280 &  0.3100 &   0.2940 &   0.3340 &   \textbf{0.2520} \\
-	2 & 0.2860 &  0.2880 &   0.2540 &   0.3420 &   \textbf{0.2520} \\		
-	3 & 0.3840 &  0.3100 &   \textbf{0.2560} &   0.3620 &   0.3140 \\	
-	4 & 0.3660 &  0.3420 &   0.2860 &   0.3360 &   \textbf{0.2780} \\
-	5 & 0.3340 &  0.2980 &   0.3000 &   0.3960 &   \textbf{0.2540} \\
+1 & 0.5920    & 0.5160    & 0.5820    & 0.7780 & \textbf{0.2160}   & 0.2260 \\
+2 & 0.5820    & 0.4840    & 0.5720    & 0.7080 & \textbf{0.2160}   & 0.2300 \\
+3 & 0.6140    & 0.5520    & 0.5900    & 0.7240 & 0.1920   & \textbf{0.1840} \\
+4 & 0.5980    & 0.5120    & 0.6560    & 0.7020 & \textbf{0.2500}   & 0.3040 \\
+5 & 0.6220    & 0.5620    & 0.7240    & 0.7080 & \textbf{0.1820}   & 0.3040 \\
 	\hline
     \end{tabular}
-    \caption{Error rates of various classifiers using $26$ image features \label{table:results-only-features}}
+    \caption{Error rates of various classifiers using $25$ image features \label{table:results-only-features}}
 \end{table}
 
-From these measurements we directly notice that using support vector machines with polynomial kernel as classifier yields the best result with an average error rate of $27\%$. Although this is a good initial result, we want to decrease the error rate.
+From these measurements we directly notice that using the Fisher classifier yields the best result with an average error rate of $21.1\%$. Although this is a good initial result, we want to decrease the error rate. In the next section we continue tests using Fisher and support-vector machines classifiers since these give the best initial results.
 
 \subsection{Improving the Error Rate}
+
+\todo{Trying different kernels is irrelevant since Fisher is best?}
 
 First we want to see the effect of using different kernels with SVC. This is done by applying the same settings as above and training SVC with the seven different kernels.
 
@@ -338,26 +341,17 @@ After performing tests with these kernels we quickly concluded to stick to the \
 
 We also wanted to try adding more features to the dataset returned by the \texttt{my\_rep} function. In order to do this, two options were available to us, first we could compute more (advanced) image features, and second we could down-scale the images and add the pixel values as features. Since we already maximally exploited DIPimage's \texttt{measure} function to compute image features we chose to test the second method first. \\
 
-The \texttt{my\_rep} function was modified so that it also down-scales the image to square size of $d \times d$ pixels. Before doing this we applied \emph{gaussian smoothing} to the digits and then applied resampling using \emph{Lanczos method} \cite{lanczos-filtering} as implemented by DIPimage. Our approach is to start by down-scaling the image by a large factor (small $d$) so that little pixels are added as features. We perform classification of our SVC using polynomial kernel and analyze the error rate. Then we continue increasing $d$ and see what effect this has on the error rate.
+The \texttt{my\_rep} function was modified so that it also down-scales the image to square size of $d \times d$ pixels. Before doing this we applied \emph{gaussian smoothing} to the digits and then applied resampling using \emph{Lanczos method} \cite{lanczos-filtering} as implemented by DIPimage. Our approach is to start by down-scaling the image by a large factor (small $d$) so that little pixels are added as features. We perform classification using Fisher and SVC classifiers since these initially gave the best results.of our SVC Then we continue gradually increasing $d$ and see what effect this has on the error rate. The results are summerized in the graph displayed in Figure~\ref{fig:error-rate-increasing-pixel-features}, the error rates of Fisher are shown as dashed line while the SVC results are represented by the solid line.
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|lllllllll|}
-    \hline
-    $d$ & $4$ & $6$ & $8$ & $10$ & $12$ & $13$ & $14$ & $15$ & $16$ \\
-    \hline
-    1 & 0.2860 & 0.1960 & 0.2120 & 0.1620 & 0.1700 & 0.1540 & 0.1500 & 0.1700 & 0.1540 \\
-    2 & 0.3100 & 0.2540 & 0.2380 & 0.2180 & 0.1800 & 0.1760 & 0.1120 & 0.1600 & 0.2100 \\
-    3 & 0.2600 & 0.2540 & 0.2480 & 0.1680 & 0.1640 & 0.1620 & 0.1680 & 0.1980 & 0.1940 \\
-    4 & 0.2400 & 0.2120 & 0.2180 & 0.1700 & 0.1880 & 0.1920 & 0.1640 & 0.1740 & 0.1920 \\
-    \hline
-      & 0.2740 & 0.2290 & 0.2290 & 0.1795 & 0.1755 & 0.1710 & \textbf{0.1485} & 0.1755 & 0.1875 \\ 
-    \hline
-    \end{tabular}
-    \caption{Error rates using SVC and additional $d \times d$ pixel features \label{tab:svc-adding-pixel-features}}
-\end{table}
+\begin{figure}[H]
+    \center
+    \includegraphics[trim = 25mm 10mm 25mm 10mm, clip,width=.8\textwidth]{scenario2-adding-pixels.png}
+    \caption{Error rate with adding increasing number of pixel (average over $4$ tests)) \label{fig:error-rate-increasing-pixel-features}}
+\end{figure}
 
-From the results, displayed in Table~\ref{tab:svc-adding-pixel-features}, we notice a declining error rate if we add more pixels as features. However the average error rate increases if we continue to increase the image size beyond $14 \times 14$ pixels. One hypothesis about this increasing error rate beyond this size is that it is account for by the \emph{curse of dimensionality}. In conclusion we can say that the best results with an average error rate of $\mathbf{14.9 \%}$ were achieved using $25$ image features and $196$ additional pixel features. 
+\clearpage
+
+\todo{write conclusion about results analyzing the graph above}
 
 \subsection{Misclassification of Individual Digits}
 
@@ -375,7 +369,7 @@ The chart displays the error rates per digit and directly shows us that digit $8
 
 In this section we discuss possible improvements for the classifiers we have presented in this article. \todo{Discuss possible improvements for scenario 1} \\
 
-Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Table~\ref{tab:svc-adding-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. \todo{this is not finished}
+Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Table~\ref{tab:svc-adding-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. Another approach would be to extend the preprocessing steps. Morpohological image operations such as \emph{opening} and \emph{closing} can help to make the written digits more clear allowing easier recognition.
 
 
 \section{Appendix A: Result matrices}
@@ -473,10 +467,10 @@ The matrix of the error-rates after applying different classifiers on PCA-mapped
 
 \section{Appendix B: Matlab Code}
 
-\begin{lstlisting}[caption=Script for performance evaluation of scenario 2,label=code:eval-script-scenario2]
+\begin{lstlisting}[caption=Script for performance evaluation,label=code:eval-script-scenario]
 nist_data = prnist(0:9,1:1000);
 
-iter = 2;      % Number of performance evaluations
+iter = 2;       % Number of performance evaluations
 num_test = 50;  % Number of test objects per class
 
 errors = zeros(1:iter, 1);

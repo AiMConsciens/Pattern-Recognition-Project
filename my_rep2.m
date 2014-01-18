@@ -4,7 +4,7 @@ function a = my_rep2( m )
     m = m*im_resize([],[128 128])*im_box([],1,0);
 
     % Pixel features of size d*d
-    d = 0; 
+    d = 9; 
     
     % Converting to DIPimage and computing pixel features
     % Empty matrix for the results
@@ -81,7 +81,7 @@ function a = my_rep2( m )
             mat_img = im2mat(dip_img);
 
             for j = 0:(d-1)
-                istart = 25+(d*j)+2;
+                istart = 25+(d*j)+1;
                 iend = istart+(d-1);
 
                 %fprintf('[%i, %i]\n', istart, iend); 

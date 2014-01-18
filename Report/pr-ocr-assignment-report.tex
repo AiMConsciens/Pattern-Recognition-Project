@@ -213,7 +213,7 @@ The summary shows that domain scaling and no scaling perform best, but that c-me
 \begin{table}[H]
   \small
   \centering
-    \begin{tabular}{l|llllllllll|l|}
+    \begin{tabular}{l|llllllllll|l}
     \hline
      & & & & & & & &  & \textbf{SVC P} & \textbf{SVC R} &  \\
     \hline
@@ -233,8 +233,15 @@ The summary shows that domain scaling and no scaling perform best, but that c-me
 From the table we conclude that the support vector classifier for the \textit{polynomial} and \textit{radial kernel} perform best while using the scaling \textit{c-mean} and \textit{domain}. 
 
 
-
 \subsection{Classifying extra features with DIP image}
+
+To optimize the classifier while having a lot of test samples, we had the idea to compute more features. Therefore the \texttt{DIPimage} function was used, which can compute $26$ extra features out of the images. \texttt{DIPimage} is discussed in more detail in the next chapter. The outcome of the classification over the features was performing a lot worse than direct classification on the pixels. Even when the size of the training data was lowered to avoid the \emph{curse of dimensionality}, it didn't get close to the already obtained results. \\
+
+The reason for the worse performance is probably the big available amount of training data which is enough to train classifiers on the pixels so a classifier doesn't need more information-dense features. 
+
+\subsection{Conclusion of scenario 1}
+
+In this scenario, the best way to classify the data, narrowing to the methods raised, is to perform a PCA on scaled pixels and classify the data with a support vector classifier. The kernel that is used for the PCA is c-mean, which shifts the pixels to the origin but doesn't scale the variation. The pixels are scaled by bicubical interpolation to a size of $10 \times 13$. With these settings, error rates between $1.0$ and $1.8\%$ are obtained.
 
 \clearpage
 

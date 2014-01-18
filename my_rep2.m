@@ -1,37 +1,26 @@
 function a = my_rep2( m )
 
     % Simple preprocessing
-    %fprintf('Preprocessing data set...\n');
-    %preproc = im_box([],0,1)*im_rotate*im_resize([],[128 128])*im_box([],1,0);
-    %preproc = im_box([],0,1)*im_resize([],[128 128])*im_box([],1,0);
     m = m*im_resize([],[128 128])*im_box([],1,0);
 
-    % Convert the entire dataset to image objects
-    %printf('Converting dataset to images...\n');
-    %im = data2im(a);
-    %fprintf('Finished preprocessing!\n');
-
-    % TODO: resize image to 12*10 image (10px = width)
-    d = 14; 
+    % Pixel features of size d*d
+    d = 0; 
     
     % Converting to DIPimage and computing pixel features
     % Empty matrix for the results
-    M = zeros(length(m), d^2 + 26);
+    M = zeros(length(m), d^2 + 25);
+    
+    % Obtain the label from the object
+    labels = getlabels(m);
 
     for i = 1:length(m)
         % Convert to DIPimage object
         dip_img = data2im(m(i));
 
-        % Obtain the label from the object
-        label = getlabels(m(i));
-
-        % Get the numeric value of the digit in the image
-        numlab = str2num(label(7));
-
         % Perform closing operation on the image
         % image_out = closing(image_in,filterSize,filterShape)
-        %dip_img = closing(dip_img, 2, 'elliptic');
-        %dip_img = smooth(dip_img);
+        %dip_img = closing(dip_img, close_size);
+        dip_img = smooth(dip_img);
         
         % Perform gray-value stretching
         %dip_img = stretch(dip_img);
@@ -55,42 +44,32 @@ function a = my_rep2( m )
 
             % Selected with the max size has index j
         end
-
-        M(i,1)  = numlab;            % label
-        M(i,2)  = obj_count;         % number of objects
-        M(i,3)  = sum(msr.Size);     % size of all objects
-        M(i,4)  = msr.Radius(2,j);   % avg. radius of largest object
-        M(i,5)  = msr.Center(1,j);   % CenterX of largest object
-        M(i,6)  = msr.Center(2,j);   % CenterY of largest object
-        M(i,7)  = msr.Gravity(1,j);  % GravityX of largest object
-        M(i,8)  = msr.Gravity(2,j);  % GravityY of largest object
-        M(i,9)  = msr.Inertia(1,j);  % InertiaM1 of largest object
-        M(i,10) = msr.Inertia(2,j);  % InertiaM2 of largest object
-        M(i,11) = msr.Mu(1,j);       % Mu_xx of largest object
-        M(i,12) = msr.Mu(2,j);       % Mu_xy of largest object
-        M(i,13) = msr.Mu(3,j);       % Mu_yy of largest object
-        M(i,14) = msr.ConvexArea(j); % ConvexArea of largest object
-        M(i,15) = msr.CartesianBox(1,j); % CartBoxX around largest object
-        M(i,16) = msr.CartesianBox(2,j); % CartBoxY around largest object
-        M(i,17) = msr.CCBendingEnergy(1,j); % CCBendingEnergy of largest object
-        M(i,18) = msr.Convexity(j);  % Convexity of largest object
-        M(i,19) = msr.Feret(1,j);    % FeretMax of largest object
-        M(i,20) = msr.Feret(2,j);    % FeretMin of largest object
-        M(i,21) = msr.Feret(4,j);    % FeretAngleMax of largest object
-        M(i,22) = msr.Feret(5,j);    % FeretAngleMin of largest object
-        M(i,23) = msr.Mean(j);       % Mean object intensity
-        M(i,24) = msr.P2A(j);        % Circularity
-        M(i,25) = msr.Perimeter(j);  % Perimeter (chain-code method)
-        M(i,26) = msr.Sum(j);        % Sum of all pixels
-    
-        %mu_21 = im_cmoment(+m(i), 2, 1);
-        %mu_12 = im_cmoment(+m(i), 1, 2);
-        %mu_22 = im_cmoment(+m(i), 2, 2);
         
-        %M(i,27) = mu_21;
-        %M(i,28) = mu_12;
-        %M(i,29) = mu_22;
-        
+        M(i,1)  = obj_count;         % number of objects
+        M(i,2)  = sum(msr.Size);     % size of all objects
+        M(i,3)  = msr.Radius(2,j);   % avg. radius of largest object
+        M(i,4)  = msr.Center(1,j);   % CenterX of largest object
+        M(i,5)  = msr.Center(2,j);   % CenterY of largest object
+        M(i,6)  = msr.Gravity(1,j);  % GravityX of largest object
+        M(i,7)  = msr.Gravity(2,j);  % GravityY of largest object
+        M(i,8)  = msr.Inertia(1,j);  % InertiaM1 of largest object
+        M(i,9)  = msr.Inertia(2,j);  % InertiaM2 of largest object
+        M(i,10) = msr.Mu(1,j);       % Mu_xx of largest object
+        M(i,11) = msr.Mu(2,j);       % Mu_xy of largest object
+        M(i,12) = msr.Mu(3,j);       % Mu_yy of largest object
+        M(i,13) = msr.ConvexArea(j); % ConvexArea of largest object
+        M(i,14) = msr.CartesianBox(1,j); % CartBoxX around largest object
+        M(i,15) = msr.CartesianBox(2,j); % CartBoxY around largest object
+        M(i,16) = msr.CCBendingEnergy(1,j); % CCBendingEnergy of largest object
+        M(i,17) = msr.Convexity(j);  % Convexity of largest object
+        M(i,18) = msr.Feret(1,j);    % FeretMax of largest object
+        M(i,19) = msr.Feret(2,j);    % FeretMin of largest object
+        M(i,20) = msr.Feret(4,j);    % FeretAngleMax of largest object
+        M(i,21) = msr.Feret(5,j);    % FeretAngleMin of largest object
+        M(i,22) = msr.Mean(j);       % Mean object intensity
+        M(i,23) = msr.P2A(j);        % Circularity
+        M(i,24) = msr.Perimeter(j);  % Perimeter (chain-code method)
+        M(i,25) = msr.Sum(j);        % Sum of all pixels
         
         % Resize the image
         if (d > 0)
@@ -102,7 +81,7 @@ function a = my_rep2( m )
             mat_img = im2mat(dip_img);
 
             for j = 0:(d-1)
-                istart = 26+(d*j)+2;
+                istart = 25+(d*j)+2;
                 iend = istart+(d-1);
 
                 %fprintf('[%i, %i]\n', istart, iend); 
@@ -116,18 +95,18 @@ function a = my_rep2( m )
     %   row 1 =         label
     %   row 2-26 =      features
     %   row 27-171 =    pixel values
-    a_tmp = prdataset(M(:,2:(d^2+26)), M(:,1));
+    a = prdataset(M, labels);
 
     % Distance Matrix and PCA
-    mapping = scalem(a_tmp, 'variance');
-    scaledData = a_tmp*mapping;
+    %mapping = scalem(a_tmp, 'variance');
+    %scaledData = a_tmp*mapping;
 
     % Perform PCA
-    [mapping, frac] = pcam(scaledData, 20);
+    %[mapping, frac] = pcam(scaledData, 20);
     %disp(frac);
 
     % Return the dataset after PCA
-    a = scaledData;
+    %a = scaledData;
     %a = scaledData*mapping;
     
     % Feature selection does not seem good solution

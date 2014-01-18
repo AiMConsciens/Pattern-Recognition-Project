@@ -9,7 +9,7 @@ nist_data = prnist(0:9,1:1000);
 
 clc;
 
-iter = 2;      % Number of performance evaluations
+iter = 5;       % Number of performance evaluations
 num_test = 50;  % Number of test objects per class
 
 errors = zeros(1:iter, 1);
@@ -29,4 +29,4 @@ for i = 1:iter
     errors(i) = E;
 end
 
-disp(errors);
+errors'

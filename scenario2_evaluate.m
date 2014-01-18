@@ -93,7 +93,7 @@ for i = 1:iter
     trn_scaled = trn_unscaled*mapping_scale;
     
     % Perform PCA
-    [mapping_pca, frac] = pcam(trn_scaled, 20);
+    [mapping_pca, frac] = pcam(trn_scaled, 60);
     
     % Return the dataset after performing PCA
     trn_pca = trn_scaled*mapping_pca;

@@ -247,10 +247,6 @@ The obtained error-rates in this chapter show that classification on raw pixels 
 
 In this scenario, the best way to classify the data, narrowing to the methods raised, is to perform a PCA on scaled pixels and classify the data with a support vector classifier. The kernel that is used for the PCA is c-mean, which shifts the pixels to the origin but doesn't scale the variation. The pixels are scaled by bicubical interpolation to a size of $10 \times 13$. With these settings, error rates between $1.0$ and $1.8\%$ are obtained.
 
-\clearpage
-
-
-
 \section{Scenario 2: \textit{System is trained for each batch}}
 
 The second scenario allows the classifier to be trained for every batch of cheques to be processed. As a concequence the dataset available for training is much smaller, in this scenario we train the classifier using at most $10$ objects per class. The target for this assignment is $25\%$ test error.

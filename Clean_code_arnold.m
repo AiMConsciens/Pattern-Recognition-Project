@@ -1,5 +1,5 @@
 
-a = prnist([0:9],[1:1:1000]);
+a = prnist([0:9],[1:10:1000]);
 preproc = im_box([],0,1)*im_resize([],[(10) (13)],'bicubic')*im_box([],1,0);
 a = a*preproc;
 pr_a = prdataset(a);

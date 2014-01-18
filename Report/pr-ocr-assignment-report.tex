@@ -336,11 +336,17 @@ The figure above shows the average error rate over $4$ tests. Strangely enough w
 
 We also tested our classifier after performning \emph{feature selection} using the \texttt{featselb} function. As a starting point we choose the optimal settings from our previous experiment, i.e. we used $25$ image features and $16 \times 16$ additional pixel features. Unfortunately a decrease in error rate was not observed and the computation times for performing feature selection on an initial number of $25 + 16^2 = 281$ were too long. The Matlab code that was used for performing feature selection can be found in Listing~\ref{code:scenario2-test-featsel} (Appendix B).
 
-\subsection{Misclassification of Individual Digits}
+\subsection{Feature Extraction}
 
-To better understand our results we analyzed the misclassification rates per individual digit. This allows us to determine which of the digits are hard to correctly classify and give insight in how to improve our algorithm. Obtaining these numbers was straight forward, we performed classification $8$ times and averages the misclassification rates. The results are displayed in Figure~\ref{fig:digit-misclassification}. \\
+Since feature selection did not give the desired results we continued by performing feature extracting by means of PCA. Just like in scenario 1 we first computed the scaled mapping with \texttt{scalem} and then the PCA mapping with \texttt{pcam}. For these tests we only used SVC as classifier and excluded the pixel features from the data set. By studying the fraction of \emph{cumulative variance} retained we noticed that extracting only $10$ dimensions already captures the entire variance spectrum. Using a mapping to $10$ dimensions we obtained an average error rate of \todo{$20 \%$}. While these results exceeded our expectations we did not manage to decrease the error rate below the $18 \%$ we reached in our initial tests.
 
-The chart displays the error rates per digit and directly shows us that digit $8$ is most often misclassified whereas the digit $0$ has the lowest error rate. \todo{explain why these digits are the highest and lowest, probably the best is to give some examples in picture form.}
+\section{Recommendations}
+
+In this section we discuss possible improvements for the classifiers we have presented in this article. \todo{Discuss possible improvements for scenario 1} \\
+
+Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Figure~\ref{fig:error-rate-increasing-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. Another approach would be to extend the preprocessing steps. Morpohological image operations such as \emph{opening} and \emph{closing} can help to make the written digits more clear allowing easier recognition. \\
+
+To better understand the classification results we also recommend in-depth analysis of the \emph{confusion matrix} or the misclassification rates per individual digit. This allows for better understanding of the results and possible ways to improve the algorithm by implementing image features that are robust for the digits that are currently hard to classify. For the classifier we designed for scenario 2 the digit `eight' was the most problematic as can be seen from Figure~\ref{fig:digit-misclassification} (note: these error rates were not obtained using \texttt{nist\_eval}). Analysing these results and coming up with new features that are better capable to recognise the digit $8$ for example was beyond the scope of this project but can be very interesting for future work.
 
 \begin{figure}[H]
     \center
@@ -348,12 +354,7 @@ The chart displays the error rates per digit and directly shows us that digit $8
     \caption{Misclassification rates per digit (average over $8$ batches) \label{fig:digit-misclassification}}
 \end{figure}
 
-\section{Recommendations}
-
-In this section we discuss possible improvements for the classifiers we have presented in this article. \todo{Discuss possible improvements for scenario 1} \\
-
-Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Table~\ref{tab:svc-adding-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. Another approach would be to extend the preprocessing steps. Morpohological image operations such as \emph{opening} and \emph{closing} can help to make the written digits more clear allowing easier recognition.
-
+\clearpage
 
 \section{Appendix A: Result matrices}
 

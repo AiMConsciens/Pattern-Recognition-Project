@@ -4,7 +4,7 @@ function a = my_rep2( m )
     m = m*im_resize([],[128 128])*im_box([],1,0);
 
     % Pixel features of size d*d
-    d = 0; 
+    d = 16; 
     
     % Converting to DIPimage and computing pixel features
     % Empty matrix for the results
@@ -19,11 +19,11 @@ function a = my_rep2( m )
 
         % Perform closing operation on the image
         % image_out = closing(image_in,filterSize,filterShape)
-        %dip_img = closing(dip_img, close_size);
+        dip_img = closing(dip_img, 4);
         dip_img = smooth(dip_img);
         
         % Perform gray-value stretching
-        %dip_img = stretch(dip_img);
+       %dip_img = stretch(dip_img);
 
         % Threshold the image to obtain binary represtation
         binary = threshold(dip_img);

@@ -84,7 +84,7 @@ errors = zeros(1:iter, 1);
 
 for i = 1:iter
     % Generate a random training set with 400 objects per class 
-    n_trn = gendat(nist_data, 0.1);
+    n_trn = gendat(nist_data, 0.01);
     % Calculate trainings prdataset object
 
     trn_unscaled = my_rep2(n_trn);
@@ -111,6 +111,7 @@ for i = 1:iter
 end
 
 errors'
+notify('test');
 
 %% Code for error graph increasing pixels
 

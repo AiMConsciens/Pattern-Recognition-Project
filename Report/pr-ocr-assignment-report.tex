@@ -52,30 +52,30 @@ The strucure of this article is as follows. We start off by discussing the first
 As already mentioned, this scenario only allows the recognition system to be trained once. After this initial training phase the system should be able to recognize individual digits with an error rate lower than $5\%$. This means that we should use a large amount of training data in order to allow accurate classification. Because of the presence of a lot of training data, there are many ways to train a classifier. We will try to find an optimum between the amount of features, the kind of features, the manipulation of them and the classifier. \st{The available time for the project forces us to make decisions for skipping methods, so sometimes choices will be made for rejecting or skipping classification methods based on the result of a single measurement.} 
 
 \subsection{Classifying raw pixels}
-The first way of classifying is to use the raw pixels of the image without filtering or adding extra features. Since the images contain $256 \times 256$ pixels, using all the pixels yields an amount of features bigger than the size of the training set. To avoid the \emph{curse of dimensionality} we lower the amount of features by scaling the images with the image-mapping tools in \texttt{PRTools}. The optimal size and the optimal way of interpolating the pixels is found empirically. For the classification are complex classifiers preferred above less complex classifiers, because of the presence of a lot of available features. However, to make it possible to compare different classifiers on different pixel-sizes, also less complex classifiers are used such as \textit{linear discriminant classifier} and \textit{nearest mean classifier}. The results are shown in Table~\ref{table:results-only-pixels}.
+The first way of classifying is to use the raw pixels of the image without filtering or adding extra features. Since the images contain $256 \times 256$ pixels, using all the pixels yields an amount of features bigger than the size of the training set. To avoid the \emph{curse of dimensionality} we lower the amount of features by scaling the images with the image-mapping tools in \texttt{PRTools}. The optimal size and the optimal way of interpolating the pixels is found empirically. For the classification are complex classifiers preferred above less complex classifiers, since the high number of available features. However, to make it possible to compare different classifiers on different pixel-sizes, also less complex classifiers are used such as \textit{linear discriminant classifier} and \textit{nearest-mean classifier}. The results of using various classifiers are shown in Table~\ref{table:results-only-pixels}.
 
 % Table of classifiers on raw pixels
 \begin{table}[H]
   \centering
     \begin{tabular}{l|l|llllll}
     \hline
-    Scaletype & Pixels & parzen & ldc   & qdc   & fisher & nmc   & knnc \\
+    Interpolation & Pixels & Parzen & ldc   & qdc   & Fisher & nmc & knnc \\
 		\hline
-    \textbf{bicubic} & 8x8   & \textbf{0,039} & 0,109 & 0,054 & 0,136 & 0,189 & 0,046 \\
+    \textbf{Bicubic} & 8x8   & \textbf{0,039} & 0,109 & 0,054 & 0,136 & 0,189 & 0,046 \\
     \textbf{} & 9x9   & \textbf{0,036} & 0,67  & 0,191 & 0,129 & 0,193 & 0,049 \\
     \textbf{} & 10x10 & \textbf{0,021} & 0,885 & 0,488 & 0,12  & 0,15  & 0,023 \\
     \textbf{} & 11x11 & \textbf{0,03} & 0,899 & 0,65  & 0,141 & 0,187 & 0,032 \\
     \textbf{} & 12x12 & \textbf{0,044} & 0,897 & 0,675 & 0,159 & 0,194 & \textbf{0,044} \\
     \textbf{} & 13x13 & \textbf{0,041} & 0,9   & 0,69  & 0,146 & 0,198 & 0,042 \\
 		\hline
-    \textbf{nearest} & 8x8   & \textbf{0,109} & 0,16  & 0,352 & 0,177 & 0,213 & 0,13 \\
+    \textbf{Nearest} & 8x8   & \textbf{0,109} & 0,16  & 0,352 & 0,177 & 0,213 & 0,13 \\
     \textbf{} & 9x9   & \textbf{0,114} & 0,164 & 0,325 & 0,186 & 0,221 & 0,131 \\
     \textbf{} & 10x10 & \textbf{0,108} & 0,833 & 0,532 & 0,165 & 0,208 & 0,11 \\
     \textbf{} & 11x11 & \textbf{0,085} & 0,887 & 0,711 & 0,171 & 0,217 & 0,103 \\
     \textbf{} & 12x12 & \textbf{0,083} & 0,9   & 0,763 & 0,146 & 0,191 & 0,088 \\
     \textbf{} & 13x13 & \textbf{0,096} & 0,898 & 0,784 & 0,169 & 0,222 & 0,107 \\
 		\hline
-    \textbf{bilinear} & 8x8   & \textbf{0,029} & 0,111 & 0,049 & 0,14  & 0,188 & 0,032 \\
+    \textbf{Bilinear} & 8x8   & \textbf{0,029} & 0,111 & 0,049 & 0,14  & 0,188 & 0,032 \\
     \textbf{} & 9x9   & \textbf{0,047} & 0,798 & 0,284 & 0,142 & 0,203 & 0,049 \\
     \textbf{} & 10x10 & \textbf{0,032} & 0,895 & 0,579 & 0,14  & 0,199 & 0,038 \\
     \textbf{} & 11x11 & \textbf{0,039} & 0,898 & 0,689 & 0,151 & 0,192 & 0,042 \\
@@ -89,9 +89,9 @@ The first way of classifying is to use the raw pixels of the image without filte
 		\label{table:results-only-pixels}}
 \end{table}
 
-The results in the table show that the parzen and k-nearest neighbor classifiers perform best, the latter performs above expectations. The good performance of the k-nearest neighbor classifier raises the idea that the pixels per class cluster well. The quadratic bayes normal classifier (qdc) performs a bit worse, from this we conclude that the measurements of each class are not well normally distributed. As expected, the rest of the classifiers, all non-complex, perform worse. \\
+The results in the table show that the \emph{Parzen} and \emph{k-nearest neighbor} classifiers perform best, the latter performs above expectations. The good performance of the k-nearest neighbor classifier raises the idea that the pixels per class cluster well. The \emph{quadratic bayes normal classifier} (qdc) performs a bit worse, from this we conclude that the measurements of each class are not well normally distributed. As expected, the rest of the classifiers which are less complex perform worse. \\
 
-Another classifier that we use is the \textit{support vector classifier (svc)}, which is a more complex classifier. This classifier is mentioned apart, because of the amount of variable options. The classifier is able to use different kernels which are listed below and can vary the weights the features can be weighted with. 
+Another classifier that we use is the \textit{support vector classifier (svc)}, which is a more complex classifier. This classifier is mentioned seperately, because its performance depends on a lot of parameters. The classifier is able to use different kernels which are listed below and also it can vary the weights used for the features.
 
 \begin{itemize}[noitemsep]
     \item Polynomial kernel (P)
@@ -103,7 +103,7 @@ Another classifier that we use is the \textit{support vector classifier (svc)}, 
     \item City-Block kernel (C)
 \end{itemize}
 
-Only for the kernels \textit{polynomial} and \textit{radial} it was really useful to change the weight. Therefore the error-rates for the classifications with optimal weights for these kernels are shown in the tabel. Some of the kernels are ignored, since the results were not so well. The error-rates for different images sizes and interpolation methods are shown in Table~\ref{table: error rate SVC} . 
+We notices that only for the kernels \textit{polynomial} and \textit{radial} it was really useful to change the weight. Therefore the error-rates for the classifications with optimal weights for these kernels are shown in the tabel. Some of the kernels are ignored, since the results were not so well. The error-rates for different images sizes and interpolation methods are shown in Table~\ref{table: error rate SVC} . 
 
 % Table generated by Excel2LaTeX from sheet 'Sheet1'
 \begin{table}[H]

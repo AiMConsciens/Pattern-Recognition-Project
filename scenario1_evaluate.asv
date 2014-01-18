@@ -6,12 +6,13 @@ prwaitbar off;
 nist_data = prnist(0:9,1:1000);
 
 %% NIST EVAL
-prmemory(64000000);
+
 clc;
 
 iter = 1;        % Number of performance evaluations
 num_test = 100;  % Number of test objects per class
 
+prmemory(64000000);
 errors = zeros(1:iter, 1);
 
 for i = 1:iter

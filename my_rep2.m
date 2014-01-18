@@ -4,7 +4,7 @@ function a = my_rep2( m )
     m = m*im_resize([],[128 128])*im_box([],1,0);
 
     % Pixel features of size d*d
-    d = 9; 
+    d = 0; 
     
     % Converting to DIPimage and computing pixel features
     % Empty matrix for the results
@@ -91,28 +91,9 @@ function a = my_rep2( m )
 
     end
 
-    % Initialize PRdataset
-    %   row 1 =         label
-    %   row 2-26 =      features
-    %   row 27-171 =    pixel values
+    %   row 1-25 =    features
+    %   row 25-x =    pixel values
     a = prdataset(M, labels);
-
-    % Distance Matrix and PCA
-    %mapping = scalem(a_tmp, 'variance');
-    %scaledData = a_tmp*mapping;
-
-    % Perform PCA
-    %[mapping, frac] = pcam(scaledData, 20);
-    %disp(frac);
-
-    % Return the dataset after PCA
-    %a = scaledData;
-    %a = scaledData*mapping;
-    
-    % Feature selection does not seem good solution
-    %[W, R] = featself(a_tmp, 'NN', 18);
-    %disp(R);
-    %a = a_tmp*W;
 
 end
 

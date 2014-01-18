@@ -320,29 +320,7 @@ From these measurements we directly notice that using the Fisher classifier yiel
 
 \subsection{Improving the Error Rate}
 
-\todo{Trying different kernels is irrelevant since Fisher is best?}
-
-First we want to see the effect of using different kernels with SVC. This is done by applying the same settings as above and training SVC with the seven different kernels.
-
-After performing tests with these kernels we quickly concluded to stick to the \emph{polynomial kernel} since it extremely outperformed the others. The results are shown in Table~\ref{table:results-svc-kernels} with the best result indicated in bold font.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|lllllll|}
-    \hline
-    & \textbf{P} & \textbf{E} & \textbf{R} & \textbf{S} & \textbf{D} & \textbf{M} & \textbf{C} \\
-    \hline
-    1 & \textbf{0.2520} &   0.6080 &   0.7160 &   0.4660 &   0.9980 & 0.9980 &   0.9980 \\
-    2 & \textbf{0.2840} &   0.5080 &   0.7340 &   0.4980 &   1.0000 & 0.9980 &   0.9980 \\
-    3 & \textbf{0.2780} &   0.7600 &   0.7560 &   0.5160 &   0.9940 & 0.9940 &   0.9940 \\
-    4 & \textbf{0.2640} &   0.6360 &   0.8180 &   0.5060 &   1.0000 & 0.9980 &   0.9980 \\
-    5 & \textbf{0.2520} &   0.8020 &   0.8420 &   0.5460 &   0.9960 & 1.0000 &   1.0000 \\
-    \hline
-    \end{tabular}
-    \caption{Error rates using SVC with different kernels \label{table:results-svc-kernels}}
-\end{table}
-
-We also wanted to try adding more features to the dataset returned by the \texttt{my\_rep} function. In order to do this, two options were available to us, first we could compute more (advanced) image features, and second we could down-scale the images and add the pixel values as features. Since we already maximally exploited DIPimage's \texttt{measure} function to compute image features we chose to test the second method first. \\
+To improve the classification accuracy we wanted to try adding more features to the dataset returned by the \texttt{my\_rep} function. In order to do this, two options were available to us, first we could compute more (advanced) image features, and second we could down-scale the images and add the pixel values as features. Since we already maximally exploited DIPimage's \texttt{measure} function to compute image features we chose to test the second method first. \\
 
 The \texttt{my\_rep} function was modified so that it also down-scales the image to square size of $d \times d$ pixels. Before doing this we applied \emph{gaussian smoothing} to the digits and then applied resampling using \emph{Lanczos method} \cite{lanczos-filtering} as implemented by DIPimage. Our approach is to start by down-scaling the image by a large factor (small $d$) so that little pixels are added as features. We perform classification using Fisher and SVC classifiers since these initially gave the best results.of our SVC Then we continue gradually increasing $d$ and see what effect this has on the error rate. The results are summerized in the graph displayed in Figure~\ref{fig:error-rate-increasing-pixel-features}, the error rates of Fisher are shown as dashed line while the SVC results are represented by the solid line.
 
@@ -352,9 +330,11 @@ The \texttt{my\_rep} function was modified so that it also down-scales the image
     \caption{Error rate with adding increasing number of pixel (average over $4$ tests)) \label{fig:error-rate-increasing-pixel-features}}
 \end{figure}
 
-\clearpage
+The figure above shows the average error rate over $4$ tests. Strangely enough we observed a very high error rate for the Fisher classifier when the down-scaled image dimensions were approximately $9 \times 9$. This increased error rate did not occur for SVC, we are not sure why this occurs for Fisher. The lowest error rate of $\mathbf{18 \%}$ was observed using the support-vector classifier with a down-scaled image at $16 \times 16$ pixels.
 
-\todo{write conclusion about results analyzing the graph above}
+\subsection{Feature Selection}
+
+We also tested our classifier after performning \emph{feature selection} using the \texttt{featselb} function. As a starting point we choose the optimal settings from our previous experiment, i.e. we used $25$ image features and $16 \times 16$ additional pixel features. Unfortunately a decrease in error rate was not observed and the computation times for performing feature selection on an initial number of $25 + 16^2 = 281$ were too long. The Matlab code that was used for performing feature selection can be found in Listing~\ref{code:scenario2-test-featsel} (Appendix B).
 
 \subsection{Misclassification of Individual Digits}
 
@@ -495,6 +475,37 @@ end
 
 disp(errors);
 \end{lstlisting}
+
+\begin{lstlisting}[caption=Script for performance evaluation with feature selection,label=code:scenario2-test-featsel]
+for i = 1:iter
+    % Generate a random training set with 10 objects per class 
+    n_trn = gendat(nist_data, 0.01);
+    % Calculate trainings prdataset object
+
+    trn_unselected = my_rep2(n_trn);
+
+    [mapping, R] = featself(trn_unselected);
+    disp(R);
+
+    trn_featsel = trn_unselected*mapping;
+
+    % Train SVC classifier
+    %w_fisher = fisherc(trn_featsel);
+    w_svc = svc(trn_featsel);
+    
+    %w_fisher_map = mapping*w_fisher;
+    w_svc_map = mapping*w_svc;
+    
+    %E1 = nist_eval('my_rep2', w_fisher_map, num_test);
+    E2 = nist_eval('my_rep2', w_svc_map, num_test);
+    
+    %errors(i,1) = E1;   % Fisher
+    errors(i,1) = E2;   % SVC
+end
+\end{lstlisting}
+
+
+
 
 \bibliographystyle{abbrv}
 \nocite{*}

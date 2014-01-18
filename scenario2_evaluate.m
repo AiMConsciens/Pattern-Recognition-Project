@@ -32,15 +32,85 @@ for i = 1:iter
     errors(i,2) = E2;   % SVC
 end
 
-%disp('Fisher errors:');
-%errors(:,1)
-%disp('SVC errors:');
-%errors(:,2)
-
 errors
 
 load gong.mat;
 soundsc(y);
+
+%% Feature selection
+clc;
+
+iter = 4;       % Number of performance evaluations
+num_test = 50;  % Number of test objects per class
+
+errors = zeros(1:iter, 1);
+
+for i = 1:iter
+    % Generate a random training set with 10 objects per class 
+    n_trn = gendat(nist_data, 0.01);
+    % Calculate trainings prdataset object
+
+    trn_unselected = my_rep2(n_trn);
+
+    [mapping, R] = featself(trn_unselected);
+    disp(R);
+
+    trn_featsel = trn_unselected*mapping;
+
+    % Train SVC classifier
+    %w_fisher = fisherc(trn_featsel);
+    w_svc = svc(trn_featsel);
+    
+    %w_fisher_map = mapping*w_fisher;
+    w_svc_map = mapping*w_svc;
+    
+    %E1 = nist_eval('my_rep2', w_fisher_map, num_test);
+    E2 = nist_eval('my_rep2', w_svc_map, num_test);
+    
+    %errors(i,1) = E1;   % Fisher
+    errors(i,1) = E2;   % SVC
+end
+
+errors'
+
+%% PCA
+clc;
+
+iter = 4;       % Number of performance evaluations
+num_test = 50;  % Number of test objects per class
+
+errors = zeros(1:iter, 1);
+
+
+for i = 1:iter
+    % Generate a random training set with 400 objects per class 
+    n_trn = gendat(nist_data, 0.1);
+    % Calculate trainings prdataset object
+
+    trn_unscaled = my_rep2(n_trn);
+
+    mapping_scale = scalem(trn_unscaled, 'c-mean');
+    trn_scaled = trn_unscaled*mapping_scale;
+    
+    % Perform PCA
+    [mapping_pca, frac] = pcam(trn_scaled, 20);
+    
+    % Return the dataset after performing PCA
+    trn_pca = trn_scaled*mapping_pca;
+    
+    % Train SVC classifier
+    w = svc(trn_pca);
+    %w = libsvc(trn,(proxm([],'r',2.9)),1);
+    
+    w_pca = mapping_scale*mapping_pca*w;
+    
+    % Evaluate performance of classifier
+    E = nist_eval('my_rep2', w_pca, num_test);
+    
+    errors(i) = E;
+end
+
+errors'
 
 %% Code for error graph increasing pixels
 

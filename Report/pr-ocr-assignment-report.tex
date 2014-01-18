@@ -251,7 +251,7 @@ The standard methods of Matlab supplemented with the \texttt{PRtools} is limited
 
 \subsection{Feature Selection}
 
-After converting our images to \texttt{DIPimage} objects we can exploit the \texttt{measurement} method that allows easy computation of a large amount of image statistics and more. We have selected a large amount of these statistics to use as features. In the selection process we have intuitively picked the features which we thought are differentiating the digits. Table~\ref{table:image-features} lists the features that were initially used as features. We have used $16$ different image features types, however these make a total of $26$ features since some of these feature types contain an $x$ and $y$ coordinate (center) or a minimum and maximum value (Feret).
+After converting our images to \texttt{DIPimage} objects we can exploit the \texttt{measurement} method that allows easy computation of a large amount of image statistics and more. We have selected a large amount of these statistics to use as features. In the selection process we have intuitively picked the features which we thought are differentiating the digits. Table~\ref{table:image-features} lists the features that were initially used as features. We have used $16$ different image features types, however these make a total of $25$ features since some of these feature types contain an $x$ and $y$ coordinate (center) or a minimum and maximum value (Feret).
 
 \begin{table}[H]
     \small
@@ -285,7 +285,7 @@ To be able to compute all these features we create two image objects in Matlab; 
 
 \subsection{Initial Results and Optimal Classifier}
 
-Having obtained the feature matrix and converted this to data set we did some initial testing on the features. To this end we loaded the entire NIST dataset, from this we generated two datasets, one for training and one for testing. The training dataset contains $10$ objects per class, for testing we selected $50$ objects per class. \\
+Having obtained the feature matrix and converted this to data set we did some initial testing on the features. We loaded the entire NIST dataset and generated a random dataset with $10$ objects per class for training purpose. We evaluated the performance of the classifiers using the \texttt{nist\_eval} function. The complete script that was used for performance evaluation is given in Appendix B in code Listing~\ref{code:eval-script-scenario2}. \\
 
 We started training with various classifiers; \emph{nearest-mean}, \emph{fisher}, \emph{parzen}, \emph{k-nearest neighbor} and \emph{support vector machines}. The training and test phase with the class sizes as stated above were repeated five times in order to get representative results, our foundings are listed in Table~\ref{table:results-only-features}. For each result the best performance (lowest error) is indicated in bold. 
 
@@ -350,7 +350,7 @@ The \texttt{my\_rep} function was modified so that it also down-scales the image
     \caption{Error rates using SVC and additional $d \times d$ pixel features \label{tab:svc-adding-pixel-features}}
 \end{table}
 
-From the results, displayed in Table~\ref{tab:svc-adding-pixel-features}, we notice a declining error rate if we add more pixels as features. However the average error rate increases if we continue to increase the image size beyond $14 \times 14$ pixels. One hypothesis about this increasing error rate beyond this size is that it is account for by the \emph{curse of dimensionality}. In conclusion we can say that the best results with an average error rate of $\mathbf{14.9 \%}$ were achieved using $26$ image features and $196$ additional pixel features. 
+From the results, displayed in Table~\ref{tab:svc-adding-pixel-features}, we notice a declining error rate if we add more pixels as features. However the average error rate increases if we continue to increase the image size beyond $14 \times 14$ pixels. One hypothesis about this increasing error rate beyond this size is that it is account for by the \emph{curse of dimensionality}. In conclusion we can say that the best results with an average error rate of $\mathbf{14.9 \%}$ were achieved using $25$ image features and $196$ additional pixel features. 
 
 \subsection{Misclassification of Individual Digits}
 

@@ -25,7 +25,7 @@ for i = 1:iter
     
     
     % Perform PCA
-    [mapping_pca, frac] = pcam(trn_scaled, 53); %53
+    [mapping_pca, frac] = pcam(trn_scaled, 45); %53
     % Return the dataset after performing PCA
     trn_pca = trn_scaled*mapping_pca;
    

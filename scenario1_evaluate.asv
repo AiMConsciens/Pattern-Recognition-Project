@@ -6,13 +6,12 @@ prwaitbar off;
 nist_data = prnist(0:9,1:1000);
 
 %% NIST EVAL
-
+prmemory(64000000);
 clc;
 
 iter = 1;        % Number of performance evaluations
 num_test = 100;  % Number of test objects per class
 
-prmemory(64000000);
 errors = zeros(1:iter, 1);
 
 for i = 1:iter
@@ -22,8 +21,8 @@ for i = 1:iter
 
     trn_unscaled = my_rep1(n_trn);
 
-    mapping_scale = scalem(trn_unscaled, 'c-mean');
-    trn_scaled = trn_unscaled*mapping_scale;
+    %mapping_scale = scalem(trn_unscaled, 'c-mean');
+    trn_scaled = trn_unscaled;%*mapping_scale;
     
     % Perform PCA
     [mapping_pca, frac] = pcam(trn_scaled, 53);
@@ -33,9 +32,11 @@ for i = 1:iter
     
     % Train SVC classifier
     % w = fisherc(trn_pca);
-    w = libsvc(trn_pca,(proxm([],'r',2.9)),1);
+    %w = libsvc(trn_pca,(proxm([],'r',2.9)),1);
+    w = libsvc(trn_pca,(proxm([],'p',2.3)),1);
     
-    w_pca = mapping_scale*mapping_pca*w;
+    %w_pca = mapping_scale*mapping_pca*w;
+    w_pca = mapping_pca*w;
     
     % Evaluate performance of classifier
     E = nist_eval('my_rep1', w_pca, num_test);

@@ -179,9 +179,18 @@ Notice that in the confusion matrix the number \emph{one} is classified quite we
 \label{sec: Classifying PCA mapped data}
 In the previous sections, a lot of features used for the classification may not contribute significantly, which is to be expected especially when using the pixels as features. It could be useful to map the feature space into a smaller but less correlated feature space. This is done by \emph{principal component analysis} (PCA), which maps the feature space using orthogonal transformation. \\
 
-The PCA can be performed after doing different types of scaling. The first type of scaling which is used is \emph{c-mean}: the mean is shifted to the origin. Since the scales of features vary a lot, we tried to normalize the variation of the features, therefore the \emph{c-variation} is used: the mean is shifted to the origin and the average class variances are normalized. The third used way of scaling is \emph{domain}, which sets the domain of all the features to $[0, 1]$. The PCA is also performed on a non-scaled dataset. The amount of dimensions which the dataset should be scaled to, is determined by the variability that is left. It seems that a variability around $93 \%$ yields good results. The learning curve for the SVC classifier, showing the error rate against the used amount of features, is shown in the figure below.
+The PCA can be performed after doing different types of scaling. The first type of scaling which is used is \emph{c-mean}: the mean is shifted to the origin. Since the scales of features vary a lot, we tried to normalize the variation of the features, therefore the \emph{c-variation} is used: the mean is shifted to the origin and the average class variances are normalized. The third used way of scaling is \emph{domain}, which sets the domain of all the features to $[0, 1]$. The PCA is also performed on a non-scaled dataset. It is hard to prospect which scaling would do best, since it really depends on the type of features. Scaling the variance of the pixels is probably not useful since the scale is already from 0 to 1. \\
 
-\todo{import learning curve}.
+The amount of dimensions which the dataset should be scaled to, is determined by the variability that is left. The learning curve for the SVC classifier, showing the error rate against the used amount of features, is shown in figure~\ref{fig:learningcurve-PCAmapped-data}.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[trim = 25mm 10mm 25mm 20mm, clip,width=0.7\textwidth]{C:/Users/Arnold/Documents/GitHub/Pattern-Recognition-Project/Report/images/learningcurve-PCAmapped-data.jpg}
+	\caption{Learning curve on PCA mapped data}
+	\label{fig:learningcurve-PCAmapped-data}
+\end{figure}
+
+From the learning curve can be concluded that the best performance is obtained with at least $30$ dimensions, however surprisingly, the error-rate is hardly raising when using more features. It seems that enough training data is available. Looking with more detail at the outcome, it seems that a variability around $93 \%$, obtained with round about $43$ features, yields best results. 
 
 For the test, the used classifiers are equal to the classifiers above to be able to compare the differences. For displaying purposes the results are not shown here but can be found in Appendix A, a summary of these results is shown in the table below.
 
@@ -234,8 +243,33 @@ The summary shows that in this case \textit{domain} scaling and no scaling at al
   \caption{Minimum error rates of all sizes per classifier, scaling method and mapping type} \label{table: error rate summary PCA2}   
 \end{table}% 
 
-From the table we conclude that the support vector classifier for the \textit{polynomial} and \textit{radial kernel} perform best while using the scaling \textit{c-mean} and \textit{domain}. 
+From the table we conclude that the support vector classifier for the \textit{polynomial} and \textit{radial kernel} perform best while using the scaling \textit{c-mean} and \textit{domain}. To show the performance of the classifiers on the PCA-mapped data, the confusion matrix is shown in table~\ref{table: confusion matrix of PCA mapped data}.
 
+\begin{table}[H]
+  \centering
+    \begin{tabular}{|c|llllllllll|l|}
+    \hline
+    \multicolumn{1}{|c|}{True} & \multicolumn{10}{c|}{Estimated labels} & \\
+    labels & 0     & 1     & 2     & 3     & 4     & 5     & 6     & 7     & 8     & 9     & Totals \\
+    \hline
+    0     & 198   & 0     & 0     & 1     & 0     & 0     & 0     & 0     & 1     & 0     & 200 \\
+    1     & 0     & 198   & 0     & 0     & 1     & 0     & 0     & 0     & 0     & 1     & 200 \\
+    2     & 0     & 0     & 198   & 1     & 0     & 0     & 0     & 1     & 0     & 0     & 200 \\
+    3     & 1     & 0     & 0     & 196   & 0     & 1     & 0     & 0     & 2     & 0     & 200 \\
+    4     & 0     & 0     & 0     & 0     & 200   & 0     & 0     & 0     & 0     & 0     & 200 \\
+    5     & 1     & 1     & 0     & 0     & 1     & 196   & 0     & 0     & 1     & 0     & 200 \\
+    6     & 0     & 0     & 1     & 0     & 0     & 0     & 199   & 0     & 0     & 0     & 200 \\
+    7     & 0     & 0     & 0     & 0     & 0     & 0     & 0     & 198   & 0     & 2     & 200 \\
+    8     & 1     & 0     & 1     & 0     & 0     & 0     & 0     & 0     & 196   & 2     & 200 \\
+    9     & 0     & 0     & 0     & 0     & 0     & 0     & 0     & 0     & 0     & 200   & 200 \\
+    \hline
+    Totals & 201   & 199   & 200   & 198   & 202   & 197   & 199   & 199   & 200   & 205   & 2000 \\
+    \hline
+    \end{tabular}%
+  \caption{Confusion matrix of PCA mapped data} \label{table: confusion matrix of PCA mapped data}%
+\end{table}%
+
+The confusion matrix is not showing particular wrong classified numbers, it is more random. 
 
 \subsection{Classifying extra features with DIP image}
 
@@ -245,7 +279,7 @@ To optimize the classifier, we had the idea to compute more features because the
 
 The obtained error-rates in this chapter show that classification on raw pixels using PCA yields the lowest error rate. Until this point, only square image sizes were used. Because the drawings are not squares we will try to optimize the error rate by trying different pixel sizes. By resizing to other sizes, it could happen that more useful pixels may be saved and the less useful could be filtered away. All combinations between $8 \times 8$ and $13 \times 13$ are computed for the different classifiers and scale-interpolations, therefore not all the results will be shown. The minimum error rates for all the mentioned sizes over all classifiers are shown per interpolation method (\textit{nearest} is already skipped here) in appendix A table~\ref{table: minimum error rates all sizes}. \\
 
-In conclusion of the results, the SVC classifier has a really good performance for the polynomial kernel with adapted weight when using the bicubical interpolated pixels with size $10 \times 13$. There is no scaling used and the data is mapped with PCA. However, the results vary per session and vary even more when using them on the \textit{nist_eval} dataset. It seems that the best settings differ per training and testset and that this is the phase of fine-tuning. Error rates between $1.0\%$ and $1.8\%$ are obtained when testing on \textit{nist_data}. The performance on \textit{nist_eval} is little worse with error rates around $2.0\%$. 
+In conclusion of the results, the SVC classifier has the best performance for the polynomial kernel with adapted weight when using the bicubical interpolated pixels with size $10 \times 13$. There is no scaling used and the data is mapped with PCA. However, the results vary per session and vary even more when using them on the \textit{nist$\_$eval} dataset. It seems that the best settings differ per training and testset and that this is the phase of fine-tuning. Error rates between $1.0\%$ and $1.8\%$ are obtained when testing on \textit{nist$\_$data}. The performance on \textit{nist$\_$eval} is little worse with error rates around $2.0\%$. 
 
 \section{Scenario 2: \textit{System is trained for each batch}}
 
@@ -338,9 +372,12 @@ Since feature selection did not give the desired results we continued by perform
 
 \section{Recommendations}
 
-In this section we discuss possible improvements for the classifiers we have presented in this article. \todo{Discuss possible improvements for scenario 1} \\
+In this section we discuss possible improvements for the classifiers we have presented in this article. 
 
-Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Figure~\ref{fig:error-rate-increasing-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. Another approach would be to extend the preprocessing steps. Morpohological image operations such as \emph{opening} and \emph{closing} can help to make the written digits more clear allowing easier recognition. \\
+In the first phase we saw that there is a lot of variance in the outcome of the classifiers. 
+\todo{Discuss possible improvements for scenario 1} \\
+
+Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Figure~\ref{fig:error-rate-increasing-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. Another approach would be to extend the preprocessing steps. Morphological image operations such as \emph{opening} and \emph{closing} can help to make the written digits more clear allowing easier recognition. \\
 
 To better understand the classification results we also recommend in-depth analysis of the \emph{confusion matrix} or the misclassification rates per individual digit. This allows for better understanding of the results and possible ways to improve the algorithm by implementing image features that are robust for the digits that are currently hard to classify. For the classifier we designed for scenario 2 the digit `eight' was the most problematic as can be seen from Figure~\ref{fig:digit-misclassification} (note: these error rates were not obtained using \texttt{nist\_eval}). Analysing these results and coming up with new features that are better capable to recognise the digit $8$ for example was beyond the scope of this project but can be very interesting for future work.
 

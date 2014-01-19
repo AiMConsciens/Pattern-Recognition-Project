@@ -553,7 +553,7 @@ The matrix of the error-rates after applying different classifiers on PCA-mapped
 
 \section{Appendix B: Matlab Code}
 
-\begin{lstlisting}caption=Computation of the dataset for Scenario 1, label=code:myrep1]
+\begin{lstlisting}[caption=Computation of the dataset for Scenario 1, label=code:myrep1]
 function a = my_rep1( m )
     
     % Preprocess the digits
@@ -711,8 +711,6 @@ function a = my_rep2( m )
 
     end
 
-    %   row 1-25 =    features
-    %   row 25-x =    pixel values
     a = prdataset(M, labels);
 
 end

@@ -5,7 +5,6 @@ function a = my_rep1( m )
     a = m*preproc;
     
     a = prdataset(a, getlabels(m));
-    %a = prdataset(a);
     
 end
 

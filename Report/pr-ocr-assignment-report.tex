@@ -53,7 +53,7 @@ The strucure of this article is as follows. We start off by discussing the first
 As already mentioned, this scenario only allows the recognition system to be trained once. After this initial training phase the system should be able to recognize individual digits with an error rate lower than $5\%$. This means that we should use a large amount of training data in order to allow accurate classification. Because of the presence of a lot of training data, there are many ways to train a classifier. We will try to find an optimum between the amount of features, the kind of features, the manipulation of them and the classifier. 
 
 \subsection{Classification on Raw Pixel Data}
-The first way of classifying is to use the raw pixels of the image without filtering or adding extra features. Since the images contain $256 \times 256$ pixels, using all the pixels yields an amount of features bigger than the size of the training set. To avoid the \emph{curse of dimensionality} we lower the amount of features by scaling the images with the image-mapping tools in \texttt{PRTools}. The optimal size and the optimal way of interpolating the pixels is found empirically. For the classification are complex classifiers preferred above less complex classifiers, since the high number of available features. However, to make it possible to compare different classifiers on different pixel-sizes, also less complex classifiers are used such as \textit{linear discriminant classifier} and \textit{nearest-mean classifier}. The results of using various classifiers are shown in Table~\ref{table:results-only-pixels}.
+The first way of classifying is to use the raw pixels of the image without filtering or adding extra features. Since the images contain $256 \times 256$ pixels, using all the pixels yields an amount of features bigger than the size of the training set. To avoid the \emph{curse of dimensionality} we lower the amount of features by scaling the images with the image-mapping tools in \texttt{PRTools} (Our Matlab code is given in Appendix B, Listing~\ref{code:myrep2}). The optimal size and the optimal way of interpolating the pixels is found empirically. For the classification are complex classifiers preferred above less complex classifiers, since the high number of available features. However, to make it possible to compare different classifiers on different pixel-sizes, also less complex classifiers are used such as \textit{linear discriminant classifier} and \textit{nearest-mean classifier}. The results of using various classifiers are shown in Table~\ref{table:results-only-pixels}.
 
 % Table of classifiers on raw pixels
 \begin{table}[H]
@@ -190,7 +190,7 @@ The amount of dimensions which the dataset should be scaled to, is determined by
 	\label{fig:learningcurve-PCAmapped-data}
 \end{figure}
 
-From the learning curve can be concluded that the best performance is obtained with at least $35$ dimensions. Surprisingly, the error-rate is hardly raising when more features are used. This may be caused by the big amount of training data compared to the total number of features. Another hypothesis for this phenomenon is that the other pixels are not containing information, they can be on the sides and corners of the image and are therefore always white. Therefore, only the first group of pixels contain information and the rest could be useless. Looking in more detail to the outcome, it seems that a variability around $93 \%$, obtained with round about $43$ features, yields best results. 
+From the learning curve can be concluded that the best performance is obtained with at least $35$ dimensions. Surprisingly, the error-rate is hardly raising when more features are used. This may be caused by the big amount of training data compared to the total number of features. Another hypothesis for this phenomenon is that the other pixels are not containing information, they can be on the sides and corners of the image and are therefore always white. Therefore, only the first group of pixels contain information and the rest could be useless. Looking in more detail to the outcome, it seems that a variability around $93 \%$, obtained with round about $43$ features, yields best results. \\
 
 For the test, the used classifiers are equal to the classifiers above to be able to compare the differences. For displaying purposes the results are not shown here but can be found in Appendix A, a summary of these results is shown in the table below.
 
@@ -220,8 +220,6 @@ For the test, the used classifiers are equal to the classifiers above to be able
     \end{tabular}%
     \caption{Minimum error rates summary of all used classifiers after PCA per size, scaling method and mapping type} \label{table: error rate summary PCA}%
 \end{table}%
-
-\clearpage
 
 The summary shows that in this case \textit{domain} scaling and no scaling at all perform best, but that \textit{c-mean} scaling is also performing well. It is surprising that classifying on the raw images gives an only little worse error rate. Besides the summary to show which scaling type performs best at which pixel size, also the performance of the classifiers will be shown per scaling type, neglecting the size of the images. 
 
@@ -283,6 +281,8 @@ To optimize the classifier, we had the idea to compute more features because the
 The obtained error-rates in this chapter show that classification on raw pixels using PCA yields the lowest error rate. Until this point, only square image sizes were used. Because the drawings are not squares we will try to optimize the error rate by trying different pixel sizes. By resizing to other sizes, it could happen that more useful pixels may be saved and the less useful could be filtered away. All combinations between $8 \times 8$ and $13 \times 13$ are computed for the different classifiers and scale-interpolations, therefore not all the results will be shown. The minimum error rates for all the mentioned sizes over all classifiers are shown per interpolation method (\textit{nearest} is already skipped here) in Appendix A (Table~\ref{table: minimum error rates all sizes}). \\
 
 In conclusion of the results, the SVC classifier has the best performance for the polynomial kernel with adapted weight when using the bicubical interpolated pixels with size $10 \times 13$. There is no scaling used and the data is mapped with PCA. However, the results vary per session and vary even more when using them on the \textit{nist$\_$eval} dataset. It seems that the best settings differ per training and testset and that this is the phase of fine-tuning. Error rates between $1.0\%$ and $1.8\%$ are obtained when testing directly on the (randomly sampled) \texttt{nist$\_$data}. The performance when using \texttt{nist$\_$eval} is little worse with error rates around $2.0\%$. 
+
+\clearpage
 
 \section{Scenario 2: \textit{System is trained for each batch}}
 
@@ -349,8 +349,6 @@ We started training with various classifiers; \emph{nearest-mean}, \emph{fisher}
     \caption{Error rates of various classifiers using $25$ image features \label{table:results-only-features}}
 \end{table}
 
-\clearpage
-
 From these measurements we directly notice that using the Fisher classifier yields the best result with an average error rate of $21.1\%$. Although this is a good initial result, we want to decrease the error rate by adding some improvements. In the next section we continue tests using Fisher and support-vector machines classifiers since these give the best initial results.
 
 \subsection{Improving the Error Rate}
@@ -364,8 +362,6 @@ The \texttt{my\_rep} function was modified so that it also down-scales the image
     \includegraphics[trim = 25mm 10mm 25mm 10mm, clip,width=.8\textwidth]{scenario2-adding-pixels.png}
     \caption{Error rate with adding increasing number of pixel (average over $4$ tests) \label{fig:error-rate-increasing-pixel-features}}
 \end{figure}
-
-\clearpage
 
 The figure above shows the average error rate over $4$ tests. Strangely enough we observed a very high average error rate for the Fisher classifier when the down-scaled image dimensions were approximately $9 \times 9$ pixels. This increased error rate did not occur for SVC, we are not sure why this occurs for Fisher. The lowest error rate of $\mathbf{18 \%}$ was observed using the support-vector classifier with a down-scaled image at $16 \times 16$ pixels. 
 
@@ -400,6 +396,8 @@ Taking these points into account, more features could be added or the classifica
 The last recommendation for the first scenario, is to improve the images before mapping and classifying them. There are a lot of techniques available to improve the quality of images or to adapt images to be able to extract important information more easy. Other useful techniques could be to turn the pictures and cut the useless pixels. \\
 
 Also we discuss the possibilities for improving the algorithm for the second scenario. For this scenario there are two possible ways to improve the classifier. First the accuracy of the classifier can be increased, whereas the second enhancement focusses on computing time. For improving the error rates adding more pixel features is not the way to go as the results in Figure~\ref{fig:error-rate-increasing-pixel-features} shows. We recommend using less pixel values but select them more carefully by calculating which pixels contain most information. This can be done by incorporating the \emph{Shannon entropy} of the pixels and selecting the ones that are most valuable. Another approach would be to extend the preprocessing steps. Morphological image operations such as \emph{opening} and \emph{closing} can help to make the written digits more clear allowing easier recognition. \\
+
+\clearpage
 
 To better understand the classification results we also recommend in-depth analysis of the \emph{confusion matrix} or the misclassification rates per individual digit. This allows for better understanding of the results and possible ways to improve the algorithm by implementing image features that are robust for the digits that are currently hard to classify. For the classifier we designed for scenario 2 the digit `eight' was the most problematic as can be seen from Figure~\ref{fig:digit-misclassification} (note: these error rates were not obtained using \texttt{nist\_eval}). Analysing these results and coming up with new features that are better capable to recognise the digit $8$ for example was beyond the scope of this project but can be very interesting for future work.
 
@@ -554,6 +552,18 @@ The matrix of the error-rates after applying different classifiers on PCA-mapped
 \clearpage
 
 \section{Appendix B: Matlab Code}
+
+\begin{lstlisting}caption=Computation of the dataset for Scenario 1, label=code:myrep1]
+function a = my_rep1( m )
+    
+    % Preprocess the digits
+    preproc = im_box([],0,1)*im_resize([],[(10) (13)],'bicubic')*im_box([],1,0);
+    a = m*preproc;
+    
+    a = prdataset(a, getlabels(m));
+    
+end
+\end{lstlisting}
 
 \begin{lstlisting}[caption=Script for performance evaluation,label=code:eval-script-scenario]
 nist_data = prnist(0:9,1:1000);

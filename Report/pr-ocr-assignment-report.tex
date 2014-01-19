@@ -185,7 +185,7 @@ The amount of dimensions which the dataset should be scaled to, is determined by
 
 \begin{figure}[H]
 	\centering
-		\includegraphics[trim = 25mm 10mm 25mm 20mm, clip,width=0.7\textwidth]{C:/Users/Arnold/Documents/GitHub/Pattern-Recognition-Project/Report/images/learningcurve-PCAmapped-data.jpg}
+		\includegraphics[trim = 25mm 10mm 25mm 20mm, clip,width=0.7\textwidth]{learningcurve-PCAmapped-data}
 	\caption{Learning curve on PCA mapped data}
 	\label{fig:learningcurve-PCAmapped-data}
 \end{figure}
@@ -288,9 +288,9 @@ The second scenario allows the classifier to be trained for every batch of chequ
 \subsection{Representation}
 Again the development of our algorithm begins with choosing the best representation for our data set. Here we need to take into account that the number of objects that are available for training is small compared to the first scenario. Therefore the information in the raw pixel features as were used in the first part is probably not sufficient. We are left with two options, calculate various \emph{image features} or choose the path of \emph{dissimilarity measures}. In addition to the pixel features we decided to calculate image features. The advantage over the image feature representation is that every aspect of the digits can be calculated. \\
 
-The standard methods of Matlab supplemented with the \texttt{PRtools} is limited in the image analysis field. By deciding upon using the image feature representation a flexible and powerful image processing toolkit is required. We have chosen to incorporate \texttt{DIPimage} for our project since we already had experience with it and integrates nicely with \texttt{PRtools}.
+The standard methods of Matlab supplemented with the \texttt{PRtools} are limited in the image analysis field. By deciding upon using the image feature representation a flexible and powerful image processing toolkit is required. We have chosen to incorporate \texttt{DIPimage} for our project since we already had experience with it and integrates nicely with \texttt{PRtools}.
 
-\subsection{Feature Selection}
+\subsection{Image Features}
 
 After converting our images to \texttt{DIPimage} objects we can exploit the \texttt{measurement} method that allows easy computation of a large amount of image statistics and more. We have selected a large amount of these statistics to use as features. In the selection process we have intuitively picked the features which we thought are differentiating the digits. Table~\ref{table:image-features} lists the features that were initially used as features. We have used $16$ different image features types, however these make a total of $25$ features since some of these feature types contain an $x$ and $y$ coordinate (center) or a minimum and maximum value (Feret).
 
@@ -322,11 +322,11 @@ After converting our images to \texttt{DIPimage} objects we can exploit the \tex
     \caption{Image features computed by DIPimage's \texttt{measurement} function \label{table:image-features}}
 \end{table}
 
-To be able to compute all these features we create two image objects in Matlab; the original image and a thresholded binary image. The binary image is required for some measuring some of the above features. After measuring all the features we build a matrix containg the results, this will become our dataset. Before returning the dataset for classification we also perform \emph{scaling} on the variance of the features.
+To be able to compute all these features we create two image objects in Matlab; the original image and a thresholded binary image. The binary image is required for measuring some of the above features. After measuring all the features we build a matrix containg the results, this will become our dataset. 
 
 \subsection{Initial Results and Optimal Classifier}
 
-Having obtained the feature matrix and converted this to data set we did some initial testing on the features. We loaded the entire NIST dataset and generated a random dataset with $10$ objects per class for training purpose. We evaluated the performance of the classifiers using the \texttt{nist\_eval} function. The complete script that was used for performance evaluation is given in Appendix B in code Listing~\ref{code:eval-script-scenario2}. \\
+Having obtained the feature matrix and converted this to data set we did some initial testing on the features. We loaded the entire NIST dataset and generated a random dataset with $10$ objects per class for training purpose. We evaluated the performance of the classifiers using the \texttt{nist\_eval} function. The complete script that was used for performance evaluation is given in Appendix B in code Listing~\ref{code:eval-script-scenario}. \\
 
 We started training with various classifiers; \emph{nearest-mean}, \emph{fisher}, \emph{parzen}, \emph{k-nearest neighbor} and \emph{support vector machines}. The training and test phase with the class sizes as stated above were repeated five times in order to get representative results, our foundings are listed in Table~\ref{table:results-only-features}. For each result the best performance (lowest error) is indicated in bold. 
 
@@ -346,29 +346,47 @@ We started training with various classifiers; \emph{nearest-mean}, \emph{fisher}
     \caption{Error rates of various classifiers using $25$ image features \label{table:results-only-features}}
 \end{table}
 
-From these measurements we directly notice that using the Fisher classifier yields the best result with an average error rate of $21.1\%$. Although this is a good initial result, we want to decrease the error rate. In the next section we continue tests using Fisher and support-vector machines classifiers since these give the best initial results.
+\clearpage
+
+From these measurements we directly notice that using the Fisher classifier yields the best result with an average error rate of $21.1\%$. Although this is a good initial result, we want to decrease the error rate by adding some improvements. In the next section we continue tests using Fisher and support-vector machines classifiers since these give the best initial results.
 
 \subsection{Improving the Error Rate}
 
 To improve the classification accuracy we wanted to try adding more features to the dataset returned by the \texttt{my\_rep} function. In order to do this, two options were available to us, first we could compute more (advanced) image features, and second we could down-scale the images and add the pixel values as features. Since we already maximally exploited DIPimage's \texttt{measure} function to compute image features we chose to test the second method first. \\
 
-The \texttt{my\_rep} function was modified so that it also down-scales the image to square size of $d \times d$ pixels. Before doing this we applied \emph{gaussian smoothing} to the digits and then applied resampling using \emph{Lanczos method} \cite{lanczos-filtering} as implemented by DIPimage. Our approach is to start by down-scaling the image by a large factor (small $d$) so that little pixels are added as features. We perform classification using Fisher and SVC classifiers since these initially gave the best results.of our SVC Then we continue gradually increasing $d$ and see what effect this has on the error rate. The results are summerized in the graph displayed in Figure~\ref{fig:error-rate-increasing-pixel-features}, the error rates of Fisher are shown as dashed line while the SVC results are represented by the solid line.
+The \texttt{my\_rep} function was modified so that it also down-scales the image to square size of $d \times d$ pixels. Before doing this we applied \emph{gaussian smoothing} to the digits and then applied resampling using \emph{Lanczos method} \cite{lanczos-filtering} as implemented by DIPimage. Our approach is to start by down-scaling the image by a large factor (small $d$) so that little pixels are added as features. We perform classification using Fisher and SVC classifiers since these initially gave the best results. Then we continue gradually increasing $d$ and see what effect this has on the error rate. The results are summarized in the graph displayed in Figure~\ref{fig:error-rate-increasing-pixel-features}, the error rates of Fisher are shown as dashed line while the SVC results are represented by the solid line.
 
 \begin{figure}[H]
     \center
     \includegraphics[trim = 25mm 10mm 25mm 10mm, clip,width=.8\textwidth]{scenario2-adding-pixels.png}
-    \caption{Error rate with adding increasing number of pixel (average over $4$ tests)) \label{fig:error-rate-increasing-pixel-features}}
+    \caption{Error rate with adding increasing number of pixel (average over $4$ tests) \label{fig:error-rate-increasing-pixel-features}}
 \end{figure}
 
-The figure above shows the average error rate over $4$ tests. Strangely enough we observed a very high error rate for the Fisher classifier when the down-scaled image dimensions were approximately $9 \times 9$. This increased error rate did not occur for SVC, we are not sure why this occurs for Fisher. The lowest error rate of $\mathbf{18 \%}$ was observed using the support-vector classifier with a down-scaled image at $16 \times 16$ pixels.
+\clearpage
+
+The figure above shows the average error rate over $4$ tests. Strangely enough we observed a very high average error rate for the Fisher classifier when the down-scaled image dimensions were approximately $9 \times 9$ pixels. This increased error rate did not occur for SVC, we are not sure why this occurs for Fisher. The lowest error rate of $\mathbf{18 \%}$ was observed using the support-vector classifier with a down-scaled image at $16 \times 16$ pixels. 
 
 \subsection{Feature Selection}
 
-We also tested our classifier after performning \emph{feature selection} using the \texttt{featselb} function. As a starting point we choose the optimal settings from our previous experiment, i.e. we used $25$ image features and $16 \times 16$ additional pixel features. Unfortunately a decrease in error rate was not observed and the computation times for performing feature selection on an initial number of $25 + 16^2 = 281$ were too long. The Matlab code that was used for performing feature selection can be found in Listing~\ref{code:scenario2-test-featsel} (Appendix B).
+We also tested our classifier after performing \emph{feature selection} using the \texttt{featselb} function. As a starting point we choose the optimal settings from our previous experiment, i.e. we used $25$ image features and $16 \times 16$ additional pixel features. Unfortunately a decrease in error rate was not observed and the computation times for performing feature selection on an initial number of $25 + 16^2 = 281$ were too long. The Matlab code that was used for performing feature selection can be found in Listing~\ref{code:scenario2-test-featsel} (Appendix B).
 
 \subsection{Feature Extraction}
 
-Since feature selection did not give the desired results we continued by performing feature extracting by means of PCA. Just like in scenario 1 we first computed the scaled mapping with \texttt{scalem} and then the PCA mapping with \texttt{pcam}. For these tests we only used SVC as classifier and excluded the pixel features from the data set. By studying the fraction of \emph{cumulative variance} retained we noticed that extracting only $10$ dimensions already captures the entire variance spectrum. Using a mapping to $10$ dimensions we obtained an average error rate of \todo{$20 \%$}. While these results exceeded our expectations we did not manage to decrease the error rate below the $18 \%$ we reached in our initial tests.
+Since feature selection did not give the desired results we continued by performing feature extracting by means of PCA. Just like in scenario 1 we first computed the scaled mapping with \texttt{scalem} and then the PCA mapping with \texttt{pcam}. These mappings were saved in our test script and multiplied with the SVC classifier that was trained on our dataset. For these tests we only used SVC as classifier and included the pixel features in the data set. The error rates obtained after training the classifier on $10$ objects per class are displayed in Table~\ref{table:scenario2-pca}. Using PCA we were not able to decrease the misclassifation rate below the $\mathbf{18 \%}$ that was initially achieved.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l|lll|}
+    \hline
+    Dimensions & \textbf{15}     & \textbf{40}     & \textbf{60}     \\ \hline
+    \textbf{1}          & 0.1900 & 0.2260 & 0.2720 \\ 
+    \textbf{2}          & 0.1940 & 0.3020 & 0.2300 \\
+    \textbf{3}          & 0.1940 & 0.2560 & 0.2600 \\
+    \textbf{4}          & 0.3380 & 0.2080 & 0.1820 \\ \hline
+    Average   & 0.2290 & 0.2480 & 0.2360 \\ \hline
+    \end{tabular}
+    \caption{Error rates after performing PCA on the initial dataset of $281$ features. \label{table:scenario2-pca}}
+\end{table}
 
 \section{Recommendations}
 
@@ -568,7 +586,6 @@ for i = 1:iter
     trn_unselected = my_rep2(n_trn);
 
     [mapping, R] = featself(trn_unselected);
-    disp(R);
 
     trn_featsel = trn_unselected*mapping;
 
